@@ -90,31 +90,35 @@ document.addEventListener("DOMContentLoaded", function() {
         return estrellasHtml;
     }
 
-    function mostrarDetallesPelicula(peli, contenedorDetalles) {
-        if (contenedorDetalles.style.display === "none" || contenedorDetalles.style.display === "") {
-            contenedorDetalles.innerHTML = `
-                <div class="alert alert-light">
-                    <h6>Sinopsis:</h6>
-                    <p>${peli.overview || 'No hay descripción disponible'}</p>
-                    <h6>Géneros:</h6>
-                    <ul>${peli.genres.map(g => `<li>${g.name}</li>`).join('')}</ul>
-                    <button class="btn btn-info" id="toggleDetalles">Más información</button>
-                    <div id="detallesExtra" class="d-none">
-                        <p><strong>Año de lanzamiento:</strong> ${new Date(peli.release_date).getFullYear()}</p>
-                        <p><strong>Duración:</strong> ${peli.runtime} minutos</p>
-                        <p><strong>Presupuesto:</strong> $${peli.budget.toLocaleString() || 'N/A'}</p>
-                        <p><strong>Ganancias:</strong> $${peli.revenue.toLocaleString() || 'N/A'}</p>
-                    </div>
-                </div>
-            `;
-            contenedorDetalles.style.display = "block";
-
-            contenedorDetalles.querySelector("#toggleDetalles").addEventListener("click", function() {
-                const detallesExtra = contenedorDetalles.querySelector("#detallesExtra");
-                detallesExtra.classList.toggle("d-none"); 
-            });
-        } else {
-            contenedorDetalles.style.display = "none"; 
+    function mostrarDetallesPelicula(peli) {
+        const offcanvasLabel = document.getElementById("offcanvasDetallesLabel");
+        const offcanvasBody = document.getElementById("offcanvasBody");
+    
+        // Verificar si los elementos existen
+        if (!offcanvasLabel || !offcanvasBody) {
+            console.error("No se encontró el contenedor del offcanvas. Verifica el HTML.");
+            return;
         }
-    }
+    
+        // Rellenar el contenido del offcanvas
+        offcanvasLabel.textContent = peli.title;
+        offcanvasBody.innerHTML = `
+            <p><strong>Sinopsis:</strong> ${peli.overview || 'No hay descripción disponible'}</p>
+            <h6>Géneros:</h6>
+            <ul>${peli.genres.map(g => `<li>${g.name}</li>`).join('')}</ul>
+            <button class="btn btn-info dropdown-toggle" type="button" id="dropdownDetalles" data-bs-toggle="dropdown" aria-expanded="false">
+                Más
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownDetalles">
+                <li><strong>Año de lanzamiento:</strong> ${new Date(peli.release_date).getFullYear()}</li>
+                <li><strong>Duración:</strong> ${peli.runtime || 'N/A'} minutos</li>
+                <li><strong>Presupuesto:</strong> $${(peli.budget || 0).toLocaleString()}</li>
+                <li><strong>Ganancias:</strong> $${(peli.revenue || 0).toLocaleString()}</li>
+            </ul>
+        `;
+    
+        // Mostrar el offcanvas usando Bootstrap
+        const offcanvasElement = new bootstrap.Offcanvas(document.getElementById("offcanvasDetalles"));
+        offcanvasElement.show();
+    }    
 });
